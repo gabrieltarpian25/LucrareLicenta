@@ -26,6 +26,7 @@ public class MainClass {
 		System.out.println("Result named query size: " + results.size());
 	}
 	
+	// Tarpian Gabriel Lucian
 	public static void main(String args[])
 	{
 		//MainFrame.TestSelenium();
