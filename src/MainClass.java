@@ -13,7 +13,7 @@ import net.lucrare.licenta.Factura;
 public class MainClass {
 	
 	
-	
+/*
 	public static void testHibernate()
 	{
 		String PERSISTENCE_UNIT_NAME = "persistenceIG";
@@ -25,12 +25,13 @@ public class MainClass {
 		List<Factura> results = query.getResultList();
 		System.out.println("Result named query size: " + results.size());
 	}
+*/
 	
-	// Tarpian Gabriel Lucian
 	public static void main(String args[])
 	{
-		//MainFrame.TestSelenium();
 		MainFrame.run();
+		
+		//MainFrame.TestSelenium();
 		//MainFrame.extractText();
 		//MainClass.testHibernate();
 		
