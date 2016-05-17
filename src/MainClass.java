@@ -31,6 +31,8 @@ public class MainClass {
 	{
 		MainFrame.run();
 		
+		//Companies.run();
+		//LoginDetailsFrame.run();
 		//MainFrame.TestSelenium();
 		//MainFrame.extractText();
 		//MainClass.testHibernate();
