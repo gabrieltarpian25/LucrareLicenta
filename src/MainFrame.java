@@ -109,6 +109,25 @@ public class MainFrame extends JFrame {
 		}
 		return boResult;
 	}
+	
+	// function that informs us if the card details are stored
+		public static boolean findLoginDetails(String companie) {
+			boolean boResult = false;
+			String fileNameToFind = "login"+companie+".txt";
+
+			// current directory where app is installed
+			File dir = new File(System.getProperty("user.dir"));
+
+			// all children of the directory ( subfolders and files)
+			String[] children = dir.list();
+
+			for (int i = 0; i < children.length; i++) {
+				String fileName = children[i];
+				if (fileNameToFind.equals(fileName))
+					boResult = true;
+			}
+			return boResult;
+		}
 
 	// draw GUI function
 	private void drawGUI() {
@@ -247,6 +266,10 @@ public class MainFrame extends JFrame {
 		// buton adaugaFactura actionListener
 		butAdaugaFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				Companies.run();
+				
+				/*
 				JFileChooser fc = new JFileChooser();
 				fc.setCurrentDirectory(
 						new File("/Users/GabrielTarpian/Desktop/Facultate/Eclipse_Workspace_2/LucrareLicenta/Facturi"));
@@ -255,7 +278,9 @@ public class MainFrame extends JFrame {
 					File selectedFile = fc.getSelectedFile();
 					String path = selectedFile.getAbsolutePath();
 					TextParser.extractTextOrange(path);
+				
 				}
+				*/
 			}
 		});
 
@@ -286,8 +311,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-		// ************************************************************ Buton
-		// Sterge Factura
+		// ************************************************************ Buton Plateste Factura
 		butPlatesteFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (findCardDetails() == false)
@@ -298,8 +322,7 @@ public class MainFrame extends JFrame {
 			}
 		});
 
-		// ********************************************** CAUTARE
-		// ************************************************************************
+		// ***************************************************************************************** CAUTARE
 		final TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(tabel.getModel());
 		tabel.setRowSorter(rowSorter);
 		textSearchFactura.getDocument().addDocumentListener(new DocumentListener() {
@@ -334,8 +357,7 @@ public class MainFrame extends JFrame {
 			}
 
 		});
-		// *********************************************END
-		// CAUTARE*********************************************************************
+		// *********************************************END CAUTARE*********************************************************************
 	}// end of Draw Gui
 
 	// run function
