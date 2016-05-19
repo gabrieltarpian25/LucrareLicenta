@@ -1,3 +1,4 @@
+import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -17,7 +18,7 @@ public class Companies extends JFrame {
 	
 	JButton butOrange,butEon,butDigi,butEnel;
 	
-	String selectedCompany = null;
+	static String selectedCompany = null;
 	
 	public Companies()
 	{
@@ -75,18 +76,39 @@ public class Companies extends JFrame {
 		// ************* button ORANGE is clicked *************************************
 		butOrange.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-
+				
 				selectedCompany = "Orange";
-
-				frame.dispose();
-				JFileChooser fc = new JFileChooser();
-				fc.setCurrentDirectory(
-						new File("./Facturi"));
-				int result = fc.showOpenDialog(fc);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = fc.getSelectedFile();
-					String path = selectedFile.getAbsolutePath();
-					TextParser.extractTextOrange(path);
+				
+				// option "Add Bill" is selected
+				if(MainFrame.boGetAdaugaFactura() == true)
+				{
+					frame.dispose();
+					JFileChooser fc = new JFileChooser();
+					fc.setCurrentDirectory(new File("./Facturi"));
+					int result = fc.showOpenDialog(fc);
+					if (result == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = fc.getSelectedFile();
+						String path = selectedFile.getAbsolutePath();
+						TextParser.extractTextOrange(path);
+					}
+					
+					MainFrame.vSetAdaugaFactura(false);
+				}
+				
+				// option "Download bill" is selected
+				if(MainFrame.boGetDownloadFactura() == true)
+				{
+					frame.dispose();
+					if(MainFrame.findLoginDetails(selectedCompany) == true)
+					{
+						try {
+							DownloadBill.downloadOrange();
+						} catch (AWTException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+						LoginDetailsFrame.run();
+					}
 				}
 			}
 		});

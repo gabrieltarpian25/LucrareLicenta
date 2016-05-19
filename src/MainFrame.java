@@ -69,10 +69,15 @@ public class MainFrame extends JFrame {
 
 	// Singleton MainFrame
 	private static MainFrame frame = null;
+	
+	// boolean values that informs us what option is selected when showing the companies
+	static boolean boAdaugaFactura = false;
+	static boolean boDownloadFactura = false;
+	static boolean boPlatesteFactura = false;
 
 	private static JTable tabel;
 	JTextField textSearchFactura;
-	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura;
+	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, butDownloadFactura;
 	JPanel panelSus;
 	Font f;
 
@@ -97,7 +102,7 @@ public class MainFrame extends JFrame {
 		String fileNameToFind = "detaliiCard.txt";
 
 		// current directory where app is installed
-		File dir = new File(System.getProperty("user.dir"));
+		File dir = new File("./Details");
 
 		// all children of the directory ( subfolders and files)
 		String[] children = dir.list();
@@ -116,7 +121,7 @@ public class MainFrame extends JFrame {
 			String fileNameToFind = "login"+companie+".txt";
 
 			// current directory where app is installed
-			File dir = new File(System.getProperty("user.dir"));
+			File dir = new File("./Details");
 
 			// all children of the directory ( subfolders and files)
 			String[] children = dir.list();
@@ -139,11 +144,13 @@ public class MainFrame extends JFrame {
 		butAdaugaFactura = new JButton("Adauga Factura");
 		butStergeFactura = new JButton("Sterge Factura");
 		butPlatesteFactura = new JButton("Plateste Factura");
+		butDownloadFactura = new JButton("Descarca Factura");
 		textSearchFactura = new JTextField(10);
 		panelSus.add(textSearchFactura);
 		panelSus.add(butAdaugaFactura);
 		panelSus.add(butStergeFactura);
 		panelSus.add(butPlatesteFactura);
+		panelSus.add(butDownloadFactura);
 
 		// font
 		f = new Font("Arial", Font.BOLD, 15);
@@ -153,6 +160,7 @@ public class MainFrame extends JFrame {
 		butAdaugaFactura.setFont(f);
 		butStergeFactura.setFont(f);
 		butPlatesteFactura.setFont(f);
+		butDownloadFactura.setFont(f);
 
 		// add panel to layout
 		this.add(panelSus, BorderLayout.NORTH);
@@ -267,46 +275,46 @@ public class MainFrame extends JFrame {
 		butAdaugaFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				boAdaugaFactura = true;
+				boDownloadFactura = false;
+				boPlatesteFactura = false;
+				
 				Companies.run();
-				
-				/*
-				JFileChooser fc = new JFileChooser();
-				fc.setCurrentDirectory(
-						new File("/Users/GabrielTarpian/Desktop/Facultate/Eclipse_Workspace_2/LucrareLicenta/Facturi"));
-				int result = fc.showOpenDialog(fc);
-				if (result == JFileChooser.APPROVE_OPTION) {
-					File selectedFile = fc.getSelectedFile();
-					String path = selectedFile.getAbsolutePath();
-					TextParser.extractTextOrange(path);
-				
-				}
-				*/
 			}
 		});
 
 		butStergeFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				String nrFactura = getSelectedNrFactura();
+				
+				String[] options = new String[2];
+				options[0] = new String("NU");
+				options[1] = new String("DA");
+				int answer=JOptionPane.showOptionDialog(frame.getContentPane(),"Sunteti sigur?","Atentionare", 0,JOptionPane.INFORMATION_MESSAGE,null,options,null);
+				
+				if (answer == 1) 
+				{
+					String nrFactura = getSelectedNrFactura();
 
-				String PERSISTENCE_UNIT_NAME = "persistenceIG";
-				EntityManagerFactory factory;
-				factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-				EntityManager em = factory.createEntityManager();
+					String PERSISTENCE_UNIT_NAME = "persistenceIG";
+					EntityManagerFactory factory;
+					factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+					EntityManager em = factory.createEntityManager();
 
-				Query query = em.createQuery("DELETE FROM Factura f WHERE f.nrFactura = :nrFact");
-				query.setParameter("nrFact", nrFactura);
-				EntityTransaction et = em.getTransaction();
-				et.begin();
-				int r = query.executeUpdate();
-				et.commit();
-				// factory.close();
-				// em.close();
-				if (r > 0) {
-					JOptionPane.showMessageDialog(null, "Factura stearsa cu succes");
-					frame.dispose();
-					MainFrame.run();
-				} else {
-					JOptionPane.showMessageDialog(null, "Eroare", "Eroare", JOptionPane.ERROR_MESSAGE);
+					Query query = em.createQuery("DELETE FROM Factura f WHERE f.nrFactura = :nrFact");
+					query.setParameter("nrFact", nrFactura);
+					EntityTransaction et = em.getTransaction();
+					et.begin();
+					int r = query.executeUpdate();
+					et.commit();
+					// factory.close();
+					// em.close();
+					if (r > 0) {
+						JOptionPane.showMessageDialog(null, "Factura stearsa cu succes");
+						frame.dispose();
+						MainFrame.run();
+					} else {
+						JOptionPane.showMessageDialog(null, "Eroare", "Eroare", JOptionPane.ERROR_MESSAGE);
+					}
 				}
 			}
 		});
@@ -321,6 +329,19 @@ public class MainFrame extends JFrame {
 
 			}
 		});
+		
+		// ************************************************************ Buton Download Factura
+				butDownloadFactura.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						
+						MainFrame.boDownloadFactura = true;
+						boPlatesteFactura = false;
+						boAdaugaFactura = false;
+						
+						Companies.run();
+
+					}
+				});
 
 		// ***************************************************************************************** CAUTARE
 		final TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(tabel.getModel());
@@ -369,6 +390,39 @@ public class MainFrame extends JFrame {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	// Getter and Setter for AdaugaFactura option
+	public static boolean boGetAdaugaFactura()
+	{
+		return boAdaugaFactura;
+	}
+	
+	public static void vSetAdaugaFactura(boolean boValue)
+	{
+		boAdaugaFactura = boValue;
+	}
+	
+	// Getter and Setter for DownloadFactura option
+	public static boolean boGetDownloadFactura()
+	{
+		return boDownloadFactura;
+	}
+	
+	public static void vSetDownloadFactura(boolean boValue)
+	{
+		boDownloadFactura = boValue;
+	}
+	
+	// Getter and Setter for DownloadFactura option
+	public static boolean boGetPlatesteFactura() 
+	{
+		return boPlatesteFactura;
+	}
+
+	public static void vSetPlatesteFactura(boolean boValue) 
+	{
+		boPlatesteFactura = boValue;
 	}
 
 	// get number of selected bill
