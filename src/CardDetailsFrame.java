@@ -77,7 +77,7 @@ public class CardDetailsFrame extends JFrame {
 				
 				PrintWriter writer = null;
 				try {
-					writer = new PrintWriter("detaliiCard.txt", "UTF-8");
+					writer = new PrintWriter("./Details/detaliiCard.txt", "UTF-8");
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();

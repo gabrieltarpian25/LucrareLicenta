@@ -1,3 +1,4 @@
+import java.awt.AWTException;
 import java.awt.BorderLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -12,6 +13,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
@@ -20,7 +22,8 @@ public class LoginDetailsFrame extends JFrame {
 	static LoginDetailsFrame frame;
 	
 	JLabel labelEmail,labelParola,labelParola2;
-	JTextField textEmail, textParola,textParola2;
+	JTextField textEmail;
+	JPasswordField textParola,textParola2;
 	JButton butOK,butSterge;
 	
 	// class constructor
@@ -43,8 +46,8 @@ public class LoginDetailsFrame extends JFrame {
 		labelParola =  new JLabel("Parola: ");
 		labelParola2 = new JLabel("Reintroduceti parola:");
 		textEmail = new JTextField(20);
-		textParola = new JTextField(10);
-		textParola2 = new JTextField(5);
+		textParola = new JPasswordField(20);
+		textParola2 = new JPasswordField(20);
 		butOK = new JButton("Introduceti datele");
 		butSterge = new JButton("Sterge");
 		
@@ -68,12 +71,23 @@ public class LoginDetailsFrame extends JFrame {
 				// get texts from textfields
 				String email = textEmail.getText().trim();
 				String parola = textParola.getText().trim();
+				String parola2 = textParola2.getText().trim();
+				
+				if(parola.equals(parola2) == false)
+				{
+					JOptionPane.showMessageDialog(null, "Primul camp pentru parola nu se potriveste cu al doilea", "Eroare", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
 				
 				// check if parola == parola2
 				
+				String company = Companies.selectedCompany;
+				String filename ="./Details/login"+company+".txt";
+				
 				PrintWriter writer = null;
 				try {
-					writer = new PrintWriter("loginOrange.txt", "UTF-8");
+					writer = new PrintWriter(filename, "UTF-8");
 				} catch (FileNotFoundException e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -85,11 +99,26 @@ public class LoginDetailsFrame extends JFrame {
 				writer.println(parola);
 				writer.close();
 				
-				if(MainFrame.findCardDetails() == true)
+				if(MainFrame.findLoginDetails(company) == true)
 				{
 					JOptionPane.showMessageDialog(null,"Date adaugate cu succes");
 					frame.dispose();
+					
+					if(MainFrame.boGetDownloadFactura() == true)
+					{
+						if (company.equals("Orange")) 
+						{
+							try {
+								DownloadBill.downloadOrange();
+							} catch (AWTException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							MainFrame.vSetDownloadFactura(false);
+						}
+					}
 				}
+				else JOptionPane.showMessageDialog(null,"Eroare adaugare date");
 			}
 		});
 		//*************************************************************************************************************************
