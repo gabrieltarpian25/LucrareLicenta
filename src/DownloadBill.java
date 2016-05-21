@@ -24,7 +24,14 @@ public class DownloadBill {
 		File pathToBinary = new File("/Applications/Firefox.app/Contents/MacOS/firefox");
 		FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
 		FirefoxProfile firefoxProfile = new FirefoxProfile();
-		firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk","./Facturi");
+		
+		// firefox profile preferences
+		firefoxProfile.setPreference("browser.download.folderList",2);
+		firefoxProfile.setPreference("browser.download.manager.showWhenStarting",false);
+		firefoxProfile.setPreference("browser.download.dir","./Facturi");
+		firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+				"application/pdf,application/x-pdf");
+		
 		driver = new FirefoxDriver(ffBinary, firefoxProfile);
 		// driver = new FirefoxDriver();
 
@@ -47,9 +54,6 @@ public class DownloadBill {
 			//password
 			sCurrentLine = br.readLine();
 			password = sCurrentLine;
-
-			System.out.println("User: "+username +" , Pass: "+password);
-			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -65,15 +69,6 @@ public class DownloadBill {
 		driver.findElement(By.name("password")).sendKeys(new String[] { password });
 		driver.findElement(By.id("autent")).click();
 		driver.get("https://www.orange.ro/myaccount/invoice/download/lastInvoice");
-		
-		// Create object of Robot class
-		Robot object=new Robot();
-
-		// Press Enter
-		object.keyPress(KeyEvent.VK_ENTER);
-
-		// Release Enter
-		object.keyRelease(KeyEvent.VK_ENTER);
 		
 	}
 
