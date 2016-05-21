@@ -106,6 +106,7 @@ public class LoginDetailsFrame extends JFrame {
 					
 					if(MainFrame.boGetDownloadFactura() == true)
 					{
+						// *** Orange ***
 						if (company.equals("Orange")) 
 						{
 							try {

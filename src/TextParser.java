@@ -30,39 +30,52 @@ public class TextParser {
 				String parsedText=pdfStripper.getText(pdDoc);
 				System.out.println(parsedText);
 				
-				int indexUltimaZiPlata=parsedText.indexOf("Ultima zi de plata: ")+20;
-				int indexStartNumarFactura=parsedText.indexOf("Numar factura: ")+15;
-				int indexStopNumarFactura=parsedText.indexOf("Referinta interna")-2;
-				int indexDataFactura=parsedText.indexOf("Data facturii: ")+15;
-				int indexStartTotalPlata=parsedText.indexOf("Total de plata (lei)")+21;
-				int indexStopTotalPlata=0;
+				String lines[] = parsedText.split("\\r?\\n");
+				//System.out.println("Lines[3] =" + lines[3]);
 				
-				int i=indexStartTotalPlata;
-				boolean gasit=false;
-				while(gasit==false)
+				String numarFactura = null;
+				String dataFactura = null;
+				String dataScadenta = null;
+				String totalPlata = null;
+				
+				// parse every line
+				for(int i=0;i<lines.length;i++)
 				{
-					String c=parsedText.substring(i,i+1);
-					System.out.println(i+"-"+c);
-					if(c.equals("0") == false && c.equals("1") == false && c.equals("2") == false && c.equals("3") == false && 
-							c.equals("4") == false && c.equals("5") == false && c.equals("6") == false && c.equals("7") == false &&
-							c.equals("8") == false && c.equals("9") == false && c.equals(",") == false )
-						gasit=true;
-					i++;
+					// Numar Factura
+					if(lines[i].contains("Numar factura: "))
+					{
+						numarFactura = lines[i].substring(15,lines[i].length()).trim();
+						System.out.println("Numar Factura: "+numarFactura);
+					}
+					
+					// Data Facturii
+					if(lines[i].contains("Data facturii: "))
+					{
+						dataFactura = lines[i].substring(15,lines[i].length()).trim();
+						System.out.println("Data Facturii: "+dataFactura);
+					}
+					
+					// Ultima zi de plata
+					if(lines[i].contains("Ultima zi de plata: "))
+					{
+						dataScadenta = lines[i].substring(20, lines[i].length()).trim();
+						System.out.println("Data scadenta: "+dataScadenta);
+					}
+					
+					// Total de plata
+					if(lines[i].contains("Factura curenta Orange"))
+					{
+						totalPlata = lines[i+3].trim();
+						System.out.println("Total Plata: "+totalPlata);
+					}
 				}
-				indexStopTotalPlata=i;
-		
-				String numarFactura=parsedText.substring(indexStartNumarFactura,indexStopNumarFactura);
-				String dataFactura=parsedText.substring(indexDataFactura,indexDataFactura+10);
-				String dataScadenta=parsedText.substring(indexUltimaZiPlata, indexUltimaZiPlata+10);
-				String totalPlata=parsedText.substring(indexStartTotalPlata,indexStopTotalPlata);
 				
-				System.out.println("Numar Factura: "+numarFactura);//numar factura
-				System.out.println("Data Factura: "+dataFactura);//data factura
-				System.out.println("Data Scadenta: "+dataScadenta);//ultima zi de plata
-				System.out.println("Total de Plata: "+totalPlata);//total de plata
-				totalPlata=totalPlata.replace(',','.');
-				float total=Float.parseFloat(totalPlata);
-				DBUtil.insertIntoDatabase(numarFactura,"Orange Romania",dataFactura,dataScadenta,total,"Neplatita");
+				// convert totalPlata to float
+				totalPlata = totalPlata.replace(",",".");
+				float total = Float.parseFloat(totalPlata);
+				//System.out.println("Float total: "+total);
+				
+				DBUtil.insertIntoDatabase(numarFactura,"Orange",dataFactura,dataScadenta,total,"Neplatita");
 				//System.out.println(parsedText);
 			}catch(IOException e)
 			{

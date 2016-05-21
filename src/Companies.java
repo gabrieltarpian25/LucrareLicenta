@@ -107,8 +107,8 @@ public class Companies extends JFrame {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
 						}
-						LoginDetailsFrame.run();
 					}
+					else LoginDetailsFrame.run();
 				}
 			}
 		});

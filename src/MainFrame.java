@@ -74,6 +74,9 @@ public class MainFrame extends JFrame {
 	static boolean boAdaugaFactura = false;
 	static boolean boDownloadFactura = false;
 	static boolean boPlatesteFactura = false;
+	
+	// String value that stores the name of the company that it is chosen to pay the bill
+	static String company = null;
 
 	private static JTable tabel;
 	JTextField textSearchFactura;
@@ -322,11 +325,17 @@ public class MainFrame extends JFrame {
 		// ************************************************************ Buton Plateste Factura
 		butPlatesteFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				
+				company = (String) tabel.getValueAt(tabel.getSelectedRow(),1);
+				System.out.println("Compania aleasa pentru plata este : "+company);
+				
 				if (findCardDetails() == false)
 					CardDetailsFrame.run();
 				else
-					JOptionPane.showMessageDialog(null, "Fisier text creat");
-
+				{
+					if(company.equals("Orange"))
+						Payment.payOrange();
+				}
 			}
 		});
 		
