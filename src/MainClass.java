@@ -31,6 +31,7 @@ public class MainClass {
 	{
 		MainFrame.run();
 		
+		//TextParser.extractTextTelekom("./Facturi/Telekom-Aprilie_Mai_2016.pdf");
 		//TextParser.extractTextOrange("/Users/GabrielTarpian/Desktop/Facultate/Eclipse_Workspace_2/LucrareLicenta/Facturi/Orange-Noiembrie2015.pdf");
 		//Companies.run();
 		//LoginDetailsFrame.run();

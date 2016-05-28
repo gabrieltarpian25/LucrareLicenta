@@ -18,7 +18,7 @@ public class Companies extends JFrame {
 
 	static Companies frame;
 	
-	JButton butOrange,butEon,butDigi,butEnel;
+	JButton butOrange,butEon,butDigi,butEnel,butTelekom,butElectrica;
 	
 	static String selectedCompany = null;
 	
@@ -32,7 +32,7 @@ public class Companies extends JFrame {
 	private void drawGUI()
 	{
 		// properties for the frame
-		this.setLayout(new GridLayout(0,2));
+		this.setLayout(new GridLayout(0,3));
 		this.setLocation(500,300);
 		
 		// load the Orange Image
@@ -75,6 +75,34 @@ public class Companies extends JFrame {
 		butEnel.setIcon(imageIcon);
 		butEnel.setPreferredSize(new Dimension(120, 120));
 		
+		// load the TELEKOM Image
+		imageIcon = new ImageIcon("./Logos/telekom.png");
+		image = imageIcon.getImage();
+		newimg = image.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+		imageIcon = new ImageIcon(newimg); // transform it back
+		// create ENEL button
+		butTelekom = new JButton();
+		butTelekom.setIcon(imageIcon);
+		butTelekom.setPreferredSize(new Dimension(120, 120));
+		
+		// load the TELEKOM Image
+		imageIcon = new ImageIcon("./Logos/electrica.jpg");
+		image = imageIcon.getImage();
+		newimg = image.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH); // scale it the smooth way
+		imageIcon = new ImageIcon(newimg); // transform it back
+		// create ENEL button
+		butElectrica = new JButton();
+		butElectrica.setIcon(imageIcon);
+		butElectrica.setPreferredSize(new Dimension(120, 120));
+		
+		//add components to frame
+		this.add(butOrange);
+		this.add(butEon);
+		this.add(butDigi);
+		this.add(butEnel);
+		this.add(butTelekom);
+		this.add(butElectrica);
+
 		// ************* button ORANGE is clicked *************************************
 		butOrange.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -136,7 +164,7 @@ public class Companies extends JFrame {
 						TextParser.extractTextEon(path);
 					}
 					
-					MainFrame.vSetAdaugaFactura(false);
+					MainFrame.resetFlags();
 				}
 				
 				// option "Download bill" is selected
@@ -157,11 +185,43 @@ public class Companies extends JFrame {
 				}	
 			}});
 		
-		//add components to frame
-		this.add(butOrange);
-		this.add(butEon);
-		this.add(butDigi);
-		this.add(butEnel);
+		// ************* button TELEKOM is clicked *************************************
+		butTelekom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				selectedCompany = "Telekom";
+
+				// option "Add Bill" is selected
+				if (MainFrame.boGetAdaugaFactura() == true) {
+					frame.dispose();
+					JFileChooser fc = new JFileChooser();
+					fc.setCurrentDirectory(new File("./Facturi"));
+					int result = fc.showOpenDialog(fc);
+					if (result == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = fc.getSelectedFile();
+						String path = selectedFile.getAbsolutePath();
+						TextParser.extractTextTelekom(path);
+					}
+
+					MainFrame.resetFlags();
+				}
+
+				// option "Download bill" is selected
+				if (MainFrame.boGetDownloadFactura() == true) {
+					frame.dispose();
+					if (MainFrame.findLoginDetails(selectedCompany) == true) {
+						try {
+							DownloadBill.downloadTelekom();
+							// MainFrame.boDownloadFactura = false;
+						} catch (AWTException e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					} else
+						LoginDetailsFrame.run();
+				}
+			}
+		});
 	}
 	// **********************************************************************************************************************************
 	
