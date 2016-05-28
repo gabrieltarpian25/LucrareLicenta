@@ -1,5 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
@@ -46,6 +48,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
@@ -80,7 +83,7 @@ public class MainFrame extends JFrame {
 
 	private static JTable tabel;
 	JTextField textSearchFactura;
-	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, butDownloadFactura;
+	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, butDownloadFactura,butVizualizareFactura,butMarcarePlata;
 	JPanel panelSus;
 	Font f;
 
@@ -89,6 +92,14 @@ public class MainFrame extends JFrame {
 		if (frame == null)
 			frame = new MainFrame();
 		return frame;
+	}
+	
+	// reset flags for add, download, pay
+	public static void resetFlags()
+	{
+		boAdaugaFactura = false;
+		boDownloadFactura = false;
+		boPlatesteFactura = false;
 	}
 
 	// class constructor
@@ -148,12 +159,17 @@ public class MainFrame extends JFrame {
 		butStergeFactura = new JButton("Sterge Factura");
 		butPlatesteFactura = new JButton("Plateste Factura");
 		butDownloadFactura = new JButton("Descarca Factura");
+		butVizualizareFactura = new JButton("Vizualizeaza Factura");
+		butMarcarePlata = new JButton("Factura platita");
+				
 		textSearchFactura = new JTextField(10);
 		panelSus.add(textSearchFactura);
 		panelSus.add(butAdaugaFactura);
 		panelSus.add(butStergeFactura);
 		panelSus.add(butPlatesteFactura);
 		panelSus.add(butDownloadFactura);
+		panelSus.add(butVizualizareFactura);
+		panelSus.add(butMarcarePlata);
 
 		// font
 		f = new Font("Arial", Font.BOLD, 15);
@@ -164,6 +180,8 @@ public class MainFrame extends JFrame {
 		butStergeFactura.setFont(f);
 		butPlatesteFactura.setFont(f);
 		butDownloadFactura.setFont(f);
+		butVizualizareFactura.setFont(f);
+		butMarcarePlata.setFont(f);
 
 		// add panel to layout
 		this.add(panelSus, BorderLayout.NORTH);
@@ -231,7 +249,28 @@ public class MainFrame extends JFrame {
 				}
 				return Object.class;
 			}
+			
+			// set background color properties
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+				Component c = super.prepareRenderer(renderer, row, column);
 
+				String status = (String) this.getValueAt(row, 5);
+
+				Color redColor = new Color(255,210, 210);
+				Color greenColor = new Color(210, 255, 210);
+				Color selectedColor = new Color(51, 153, 255);
+
+				if (this.getSelectedRow() == row) {
+					c.setBackground(selectedColor);
+				} else {
+					if (status.equals("Platita"))
+						c.setBackground(greenColor);
+					else
+						c.setBackground(redColor);
+				}
+				return c;
+			}
+			
 			// Set cell editable to false
 			public boolean isCellEditable(int row, int column) {
 				return false;
@@ -289,6 +328,12 @@ public class MainFrame extends JFrame {
 		butStergeFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				if (tabel.getSelectedRows().length != 1)
+				{
+					JOptionPane.showMessageDialog(null, "Trebuie selectata o singura factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
 				String[] options = new String[2];
 				options[0] = new String("NU");
 				options[1] = new String("DA");
@@ -326,6 +371,19 @@ public class MainFrame extends JFrame {
 		butPlatesteFactura.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				
+				if (tabel.getSelectedRows().length != 1)
+				{
+					JOptionPane.showMessageDialog(null, "Trebuie selectata o singura factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),5);
+				if(selectedStatus.equals("Platita"))
+				{
+					JOptionPane.showMessageDialog(null, "Factura este deja platita", "Eroare", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
 				company = (String) tabel.getValueAt(tabel.getSelectedRow(),1);
 				System.out.println("Compania aleasa pentru plata este : "+company);
 				
@@ -335,6 +393,8 @@ public class MainFrame extends JFrame {
 				{
 					if(company.equals("Orange"))
 						Payment.payOrange();
+					if(company.equals("E-ON"))
+						Payment.payEon();
 				}
 			}
 		});
@@ -351,7 +411,92 @@ public class MainFrame extends JFrame {
 
 					}
 				});
+		
+		// ************************************************************ Buton Vizualizare Factura
+		butVizualizareFactura.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if(tabel.getSelectedRows().length == 1)
+				{
+					// get nr factura
+					String nrFactura = getSelectedNrFactura();
+					
+					// create entity manager
+					String PERSISTENCE_UNIT_NAME = "persistenceIG";
+					EntityManagerFactory factory;
+					factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+					EntityManager em = factory.createEntityManager();
+					
+					// query
+					Query query = em.createQuery("SELECT f FROM Factura f WHERE f.nrFactura = :nrFact");
+					query.setParameter("nrFact", nrFactura);
+					List<Factura> results = query.getResultList();
+					
+					// get the link
+					String link = results.get(0).getLink();
+					
+					em.close();
+					factory.close();
+					
+					// open the bill
+					try {
+						Desktop.getDesktop().open(new File(link));
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				else JOptionPane.showMessageDialog(null, "O singura factura trebuie selectata", "Eroare", JOptionPane.ERROR_MESSAGE);
+			}
+		});
+			
 
+		// ************************************************************ Buton Marcare Plata Factura
+		butMarcarePlata.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				if (tabel.getSelectedRows().length != 1)
+				{
+					JOptionPane.showMessageDialog(null, "Trebuie selectata o singura factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),5);
+				if(selectedStatus.equals("Platita"))
+				{
+					JOptionPane.showMessageDialog(null, "Factura este deja platita", "Eroare", JOptionPane.ERROR_MESSAGE);
+					return;
+				}
+				
+					// get nr factura
+					String nrFactura = getSelectedNrFactura();
+
+					// create entity manager
+					String PERSISTENCE_UNIT_NAME = "persistenceIG";
+					EntityManagerFactory factory;
+					factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+					EntityManager em = factory.createEntityManager();
+
+					// query
+					Query query = em.createQuery("update Factura  set  status= :newStatus" + " where nrFactura = :nrFact");
+					query.setParameter("newStatus", "Platita");
+					query.setParameter("nrFact", nrFactura);
+					EntityTransaction et = em.getTransaction();
+					et.begin();
+					int r = query.executeUpdate();
+					et.commit();
+					// factory.close();
+					// em.close();
+					if (r > 0) {
+						JOptionPane.showMessageDialog(null, "Factura editata cu succes");
+						frame.dispose();
+						MainFrame.run();
+					} else {
+						JOptionPane.showMessageDialog(null, "Eroare editare factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					}
+			}
+			});
+		
 		// ***************************************************************************************** CAUTARE
 		final TableRowSorter<TableModel> rowSorter = new TableRowSorter<>(tabel.getModel());
 		tabel.setRowSorter(rowSorter);
@@ -438,5 +583,16 @@ public class MainFrame extends JFrame {
 	public static String getSelectedNrFactura() {
 		int selIndex = tabel.getSelectedRow();
 		return (String) tabel.getValueAt(selIndex, 0);
+	}
+	
+	// get number of bills in tabel
+	public static int getNumberOfBills()
+	{
+		return tabel.getRowCount();
+	}
+	
+	public static String getBillNumber(int row)
+	{
+		return (String) tabel.getValueAt(row, 0);
 	}
 }
