@@ -95,6 +95,15 @@ public class CardDetailsFrame extends JFrame {
 				{
 					JOptionPane.showMessageDialog(null,"Date adaugate cu succes");
 					frame.dispose();
+					String selectedCompany = MainFrame.company;
+					if(selectedCompany.equals("Orange"))
+					{
+						Payment.payOrange();
+					}
+					if(selectedCompany.equals("Eon"))
+					{
+						Payment.payEon();
+					}
 				}
 			}
 		});

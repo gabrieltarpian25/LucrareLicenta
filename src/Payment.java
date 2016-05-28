@@ -141,7 +141,96 @@ public class Payment {
     //JavascriptExecutor js =(JavascriptExecutor)driver;
     //js.executeScript("window.scrollTo(0,"+element.getLocation().y+")");
     //element.click();
+	}
 	
-	
+	// ****************************************************************************** E-ON
+	public static void payEon() {
+		WebDriverWait wait;
+		WebDriver driver;
+
+		File pathToBinary = new File("/Applications/Firefox.app/Contents/MacOS/firefox");
+		FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
+
+		// firefox profile and additional preferences
+		FirefoxProfile firefoxProfile = new FirefoxProfile();
+
+		driver = new FirefoxDriver(ffBinary, firefoxProfile);
+		// driver = new FirefoxDriver();
+
+		wait = new WebDriverWait(driver, 20);
+		driver.get("https://myline-eon.ro");
+
+		String username = null;
+		String password = null;
+
+		BufferedReader br = null;
+
+		try {
+
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader("./Details/loginEon.txt"));
+			// user name
+			sCurrentLine = br.readLine();
+			username = sCurrentLine;
+
+			// password
+			sCurrentLine = br.readLine();
+			password = sCurrentLine;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
+
+		System.out.println("Download bill: " + username + " " + password);
+
+		// type search query
+		driver.findElement(By.id("username")).sendKeys(new String[] { username });
+		driver.findElement(By.id("password")).sendKeys(new String[] { password });
+		driver.findElement(By.cssSelector("*[class^='btn margin-right-10']")).click();
+		driver.get("https://myline-eon.ro/facturile-mele");
+
+		String cardNumber = null;
+		String expirationDate = null;
+		String CIV = null;
+		String cardName = null;
+
+		br = null;
+
+		try {
+
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader("./Details/detaliiCard.txt"));
+			// card number
+			sCurrentLine = br.readLine();
+			cardNumber = sCurrentLine;
+
+			// expiration date
+			sCurrentLine = br.readLine();
+			expirationDate = sCurrentLine;
+
+			// CIV
+			sCurrentLine = br.readLine();
+			CIV = sCurrentLine;
+
+			// card name
+			sCurrentLine = br.readLine();
+			cardName = sCurrentLine;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}
 	}
 }

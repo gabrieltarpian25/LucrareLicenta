@@ -17,6 +17,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 
+import org.sikuli.script.FindFailed;
+
 public class LoginDetailsFrame extends JFrame {
 
 	static LoginDetailsFrame frame;
@@ -115,7 +117,19 @@ public class LoginDetailsFrame extends JFrame {
 								// TODO Auto-generated catch block
 								e1.printStackTrace();
 							}
-							MainFrame.vSetDownloadFactura(false);
+							MainFrame.resetFlags();
+						}
+						
+						// *** E-ON ***
+						if (company.equals("Eon")) 
+						{
+							try {
+								DownloadBill.downloadEon();
+							} catch (AWTException | FindFailed e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+							MainFrame.resetFlags();
 						}
 					}
 				}

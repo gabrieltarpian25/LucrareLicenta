@@ -49,8 +49,22 @@ public class DBUtil {
 	}
 	
 	
-	public static void insertIntoDatabase(String nr,String companie,String dataEmiterii, String dataScadenta, float total,String status)
+	public static void insertIntoDatabase(String nr,String companie,String dataEmiterii, String dataScadenta, float total,String status,String link)
 	{
+		// check if bill already exists
+		int noOfBills = MainFrame.getNumberOfBills();
+		for(int i=0;i<noOfBills;i++)
+		{
+			String billNumber = MainFrame.getBillNumber(i);
+			
+			if(nr.equals(billNumber))
+			{
+				// bill exists
+				JOptionPane.showMessageDialog(null, "Factura deja existenta", "Eroare", JOptionPane.ERROR_MESSAGE);
+				return;
+			}
+		}
+		
 		dataEmiterii=dataEmiterii.replace('.','/');
 		dataScadenta=dataScadenta.replace('.','/');
 		//prepare date types
@@ -83,6 +97,7 @@ public class DBUtil {
 		f.setDataScadenta(date2);
 		f.setTotalPlata(total);
 		f.setStatus(status);
+		f.setLink(link);
 		
 		String PERSISTENCE_UNIT_NAME = "persistenceIG";
 		EntityManagerFactory factory;

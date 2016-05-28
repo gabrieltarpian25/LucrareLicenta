@@ -12,6 +12,8 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 
+import org.sikuli.script.FindFailed;
+
 public class Companies extends JFrame {
 
 	static Companies frame;
@@ -92,7 +94,7 @@ public class Companies extends JFrame {
 						TextParser.extractTextOrange(path);
 					}
 					
-					MainFrame.vSetAdaugaFactura(false);
+					MainFrame.resetFlags();
 				}
 				
 				// option "Download bill" is selected
@@ -103,6 +105,7 @@ public class Companies extends JFrame {
 					{
 						try {
 							DownloadBill.downloadOrange();
+							//MainFrame.boDownloadFactura = false;
 						} catch (AWTException e1) {
 							// TODO Auto-generated catch block
 							e1.printStackTrace();
@@ -113,6 +116,46 @@ public class Companies extends JFrame {
 			}
 		});
 		//******************************************************************************		
+		
+		// ************* button E-ON is clicked *************************************
+		butEon.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				selectedCompany = "Eon";
+				
+				// option "Add Bill" is selected
+				if(MainFrame.boGetAdaugaFactura() == true)
+				{
+					frame.dispose();
+					JFileChooser fc = new JFileChooser();
+					fc.setCurrentDirectory(new File("./Facturi"));
+					int result = fc.showOpenDialog(fc);
+					if (result == JFileChooser.APPROVE_OPTION) {
+						File selectedFile = fc.getSelectedFile();
+						String path = selectedFile.getAbsolutePath();
+						TextParser.extractTextEon(path);
+					}
+					
+					MainFrame.vSetAdaugaFactura(false);
+				}
+				
+				// option "Download bill" is selected
+				if(MainFrame.boGetDownloadFactura() == true)
+				{
+					frame.dispose();
+					if(MainFrame.findLoginDetails(selectedCompany) == true)
+					{
+						try {
+							DownloadBill.downloadEon();
+							//MainFrame.boDownloadFactura = false;
+						} catch (AWTException | FindFailed e1) {
+							// TODO Auto-generated catch block
+							e1.printStackTrace();
+						}
+					}
+					else LoginDetailsFrame.run();
+				}	
+			}});
 		
 		//add components to frame
 		this.add(butOrange);
