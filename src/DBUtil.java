@@ -49,7 +49,7 @@ public class DBUtil {
 	}
 	
 	
-	public static void insertIntoDatabase(String nr,String companie,String dataEmiterii, String dataScadenta, float total,String status,String link)
+	public static void insertIntoDatabase(String nr,String utilitate,String companie,String dataEmiterii, String dataScadenta, float total,String status,String link)
 	{
 		// check if bill already exists
 		int noOfBills = MainFrame.getNumberOfBills();
@@ -92,6 +92,7 @@ public class DBUtil {
 		//insert into database
 		Factura f=new Factura();
 		f.setNrFactura(nr);
+		f.setUtilitate(utilitate);
 		f.setCompanie(companie);
 		f.setDataEmiterii(date);
 		f.setDataScadenta(date2);

@@ -16,7 +16,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 public class Payment {
 
-	
+	//*********************************************************************************************************** ORANGE
 	public static void payOrange()
 	{
 	WebDriverWait wait;
@@ -143,7 +143,7 @@ public class Payment {
     //element.click();
 	}
 	
-	// ****************************************************************************** E-ON
+	// ********************************************************************************************************** E-ON
 	public static void payEon() {
 		WebDriverWait wait;
 		WebDriver driver;
@@ -194,6 +194,25 @@ public class Payment {
 		driver.findElement(By.id("password")).sendKeys(new String[] { password });
 		driver.findElement(By.cssSelector("*[class^='btn margin-right-10']")).click();
 		driver.get("https://myline-eon.ro/facturile-mele");
+		
+		WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("*[class^='btn btn-small js-pay-btn']")));
+		driver.findElement(By.cssSelector("*[class^='btn btn-small js-pay-btn']")).click();
+		
+		driver.get("https://myline-eon.ro/plateste-factura");
+		
+		/*
+		// find the hidden element
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.className("btn")));
+		element = driver.findElement(By.className("btn"));
+		
+		// click on the hidden element
+		JavascriptExecutor js = (JavascriptExecutor)driver;
+		js.executeScript("arguments[0].click();", element);
+		
+		/*
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.className("btn")));
+		driver.findElement(By.className("btn")).click();
+		*/
 
 		String cardNumber = null;
 		String expirationDate = null;
@@ -222,15 +241,94 @@ public class Payment {
 			sCurrentLine = br.readLine();
 			cardName = sCurrentLine;
 
-		} catch (IOException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			try {
 				if (br != null)
 					br.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+		//driver.findElement(By.cssSelector("*[class^='btn btn-small js-pay-btn']")).click();
+	}
+	
+	// ********************************************************************************************************** TELEKOM
+	public static void payTelekom() {
+		WebDriverWait wait;
+		WebDriver driver;
+
+		File pathToBinary = new File("/Applications/Firefox.app/Contents/MacOS/firefox");
+		FirefoxBinary ffBinary = new FirefoxBinary(pathToBinary);
+		FirefoxProfile firefoxProfile = new FirefoxProfile();
+		
+		// firefox profile preferences
+		firefoxProfile.setPreference("browser.download.folderList",2);
+		firefoxProfile.setPreference("browser.download.manager.showWhenStarting",false);
+		firefoxProfile.setPreference("browser.download.dir","./Facturi");
+		firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk",
+				"application/pdf,application/x-pdf");
+		
+		driver = new FirefoxDriver(ffBinary, firefoxProfile);
+		// driver = new FirefoxDriver();
+
+		wait = new WebDriverWait(driver, 60);
+		driver.get("https://www.telekom.ro");
+		
+		String username = null  ;
+		String password = null ;
+		
+		BufferedReader br = null;
+
+		try {
+
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader("./Details/loginTelekom.txt"));
+			//user name
+			sCurrentLine = br.readLine();
+			username = sCurrentLine;
+			
+			//password
+			sCurrentLine = br.readLine();
+			password = sCurrentLine;
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)br.close();
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
 		}
+		
+		System.out.println();
+		System.out.println("Telekom Login details: ");
+		System.out.println("Username: "+username);
+		System.out.println("Password: "+password);
+		
+		String winHandleBefore = driver.getWindowHandle();
+
+		// Perform the click operation that opens new window
+		driver.findElement(By.id("navMenuLogin")).click();
+		
+		for (String winHandle : driver.getWindowHandles()) {
+			driver.switchTo().window(winHandle);
+		}
+
+		// Perform the actions on new window
+		WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.id("username")));
+		driver.findElement(By.id("username")).sendKeys(new String[] { username });
+		driver.findElement(By.id("password")).sendKeys(new String[] { password });
+		driver.findElement(By.id("authSubmit")).click();
+
+		// Switch back to original browser (first window)
+		driver.switchTo().window(winHandleBefore);
+		
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("*[class^='btn btn-primary pull-left']")));
+		driver.get("https://www.telekom.ro/myaccount/servicii-fixe/plata-online/");
+		
+		driver.findElement(By.id("payBillSubmit")).click();
 	}
 }
