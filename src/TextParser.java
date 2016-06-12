@@ -70,7 +70,7 @@ public class TextParser {
 			float total = Float.parseFloat(totalPlata);
 			// System.out.println("Float total: "+total);
 
-			DBUtil.insertIntoDatabase(numarFactura, "Orange", dataFactura, dataScadenta, total, "Neplatita", filePath);
+			DBUtil.insertIntoDatabase(numarFactura,"Telefonie", "Orange", dataFactura, dataScadenta, total, "Neplatita", filePath);
 			// System.out.println(parsedText);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Eroare la citirea facturii Orange", "Eroare",
@@ -133,7 +133,7 @@ public class TextParser {
 			float total = Float.parseFloat(totalPlata);
 			System.out.println("Total Plata (string): " + total);
 
-			DBUtil.insertIntoDatabase(numarFactura, "E-ON", dataFactura, dataScadenta, total, "Neplatita", filePath);
+			DBUtil.insertIntoDatabase(numarFactura,"Gaze Naturale", "E-ON", dataFactura, dataScadenta, total, "Neplatita", filePath);
 			// System.out.println(parsedText);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Eroare la citirea facturii E-ON", "Eroare", JOptionPane.ERROR_MESSAGE);
@@ -201,7 +201,7 @@ public class TextParser {
 			System.out.println("Total Plata (string): " + totalPlata+";");
 			System.out.println("Total Plata (float): " + total+";");
 
-			DBUtil.insertIntoDatabase(numarFactura, "Telekom", dataFactura, dataScadenta, total, "Neplatita", filePath);
+			DBUtil.insertIntoDatabase(numarFactura,"Telefonie", "Telekom", dataFactura, dataScadenta, total, "Neplatita", filePath);
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, "Eroare la citirea facturii TELEKOM", "Eroare", JOptionPane.ERROR_MESSAGE);
 			e.printStackTrace();

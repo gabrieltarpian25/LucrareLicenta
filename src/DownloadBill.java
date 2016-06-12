@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.openqa.selenium.By;
@@ -151,7 +152,7 @@ public class DownloadBill {
 		driver.findElement(By.id("download")).click();
 	}
 	
-	// **************************************************************************************************** ORANGE
+	// **************************************************************************************************** TELEKOM
 	public static void downloadTelekom() throws AWTException {
 		WebDriverWait wait;
 		WebDriver driver;
@@ -204,10 +205,31 @@ public class DownloadBill {
 		System.out.println("Username: "+username);
 		System.out.println("Password: "+password);
 		
-		driver.get("https://my.telekom.ro/ssologin/ssologin.jsp?contextType=external&username=string&OverrideRetryLimit=0&contextValue=%2Foam&password=sercure_string&challenge_url=https%3A%2F%2Fmy.telekom.ro%2Fssologin%2Fssologin.jsp&request_id=3671328571729533042&authn_try_count=0&locale=en_US&resource_url=https%253A%252F%252Fmy.telekom.ro%253A443%252Fms_oauth%252Foauth2%252Fui%252Foauthservice%252Fshowconsent%253Fresponse_type%25253Dcode%252526client_id%25253D7a1b4cd678874b0e90b52aeb558be4b8%252526redirect_uri%25253Dhttps%25253A%25252F%25252Fwww.telekom.ro%25252Fsso%25252Fsession%25253FfromNavMenu%25253Dtrue%252526scope%25253DUserProfileATG.me%252526oracle_client_name%25253DPOC");
+		String winHandleBefore = driver.getWindowHandle();
+
+		// Perform the click operation that opens new window
+		driver.findElement(By.id("navMenuLogin")).click();
+		
+		for (String winHandle : driver.getWindowHandles()) {
+			driver.switchTo().window(winHandle);
+		}
+
+		// Perform the actions on new window
+		WebElement element = wait.until(ExpectedConditions.elementToBeClickable(By.id("username")));
 		driver.findElement(By.id("username")).sendKeys(new String[] { username });
 		driver.findElement(By.id("password")).sendKeys(new String[] { password });
 		driver.findElement(By.id("authSubmit")).click();
-	}
+		
+		// Close the new window, if that window no more required
+		//driver.close();
 
+		// Switch back to original browser (first window)
+		driver.switchTo().window(winHandleBefore);
+		
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("*[class^='btn btn-primary pull-left']")));
+		driver.get("https://www.telekom.ro/myaccount/servicii-fixe/plata-online/");
+		
+		driver.findElement(By.id("factura")).click();
+		
+	}
 }

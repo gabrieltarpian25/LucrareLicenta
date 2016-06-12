@@ -83,7 +83,8 @@ public class MainFrame extends JFrame {
 
 	private static JTable tabel;
 	JTextField textSearchFactura;
-	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, butDownloadFactura,butVizualizareFactura,butMarcarePlata;
+	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, butDownloadFactura,butVizualizareFactura,butMarcarePlata,
+	butGenereazaRapoarte;
 	JPanel panelSus;
 	Font f;
 
@@ -161,7 +162,8 @@ public class MainFrame extends JFrame {
 		butDownloadFactura = new JButton("Descarca Factura");
 		butVizualizareFactura = new JButton("Vizualizeaza Factura");
 		butMarcarePlata = new JButton("Factura platita");
-				
+		butGenereazaRapoarte = new JButton("Genereaza Rapoarte");		
+		
 		textSearchFactura = new JTextField(10);
 		panelSus.add(textSearchFactura);
 		panelSus.add(butAdaugaFactura);
@@ -170,10 +172,16 @@ public class MainFrame extends JFrame {
 		panelSus.add(butDownloadFactura);
 		panelSus.add(butVizualizareFactura);
 		panelSus.add(butMarcarePlata);
+		panelSus.add(butGenereazaRapoarte);
 
+		TextPrompt tp = new TextPrompt("Cautare",textSearchFactura);
+		
+		
 		// font
 		f = new Font("Arial", Font.BOLD, 15);
-
+		Font tpfont = new Font("Arial", Font.ITALIC, 15);
+		
+		tp.setFont(tpfont);
 		// set font to buttons and textField
 		textSearchFactura.setFont(f);
 		butAdaugaFactura.setFont(f);
@@ -182,6 +190,7 @@ public class MainFrame extends JFrame {
 		butDownloadFactura.setFont(f);
 		butVizualizareFactura.setFont(f);
 		butMarcarePlata.setFont(f);
+		butGenereazaRapoarte.setFont(f);
 
 		// add panel to layout
 		this.add(panelSus, BorderLayout.NORTH);
@@ -201,8 +210,9 @@ public class MainFrame extends JFrame {
 		TypedQuery<Factura> query = em.createNamedQuery("Factura.findAll", Factura.class);
 		List<Factura> results = query.getResultList();
 
-		int columns = 6;
+		int columns = 7;
 		columnNames.add("Nr Factura");
+		columnNames.add("Utilitate");
 		columnNames.add("Companie");
 		columnNames.add("Data Emiterii");
 		columnNames.add("Data Scadenta");
@@ -212,6 +222,7 @@ public class MainFrame extends JFrame {
 		for (int i = 0; i < results.size(); i++) {
 			Vector row = new Vector(columns);
 			row.add(results.get(i).getNrFactura());
+			row.add(results.get(i).getUtilitate());
 			row.add(results.get(i).getCompanie());
 			row.add(results.get(i).getDataEmiterii());
 			row.add(results.get(i).getDataScadenta());
@@ -254,7 +265,7 @@ public class MainFrame extends JFrame {
 			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
 				Component c = super.prepareRenderer(renderer, row, column);
 
-				String status = (String) this.getValueAt(row, 5);
+				String status = (String) this.getValueAt(row, 6);
 
 				Color redColor = new Color(255,210, 210);
 				Color greenColor = new Color(210, 255, 210);
@@ -287,7 +298,7 @@ public class MainFrame extends JFrame {
 		// aliniere centrata a continutului tabelului
 		DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
 		centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-		for (int i = 0; i < 6; i++)
+		for (int i = 0; i < 7; i++)
 			tabel.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
 
 		// setare font tabel
@@ -307,8 +318,8 @@ public class MainFrame extends JFrame {
 		tabel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
 		// afisare format data dd-MM-yyyy
-		tabel.getColumnModel().getColumn(2).setCellRenderer(new TimestampCellRenderer());
 		tabel.getColumnModel().getColumn(3).setCellRenderer(new TimestampCellRenderer());
+		tabel.getColumnModel().getColumn(4).setCellRenderer(new TimestampCellRenderer());
 
 		// add table to frame
 		this.add(jsp, BorderLayout.CENTER);
@@ -377,14 +388,14 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				
-				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),5);
+				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),6);
 				if(selectedStatus.equals("Platita"))
 				{
 					JOptionPane.showMessageDialog(null, "Factura este deja platita", "Eroare", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
-				company = (String) tabel.getValueAt(tabel.getSelectedRow(),1);
+				company = (String) tabel.getValueAt(tabel.getSelectedRow(),2);
 				System.out.println("Compania aleasa pentru plata este : "+company);
 				
 				if (findCardDetails() == false)
@@ -395,6 +406,8 @@ public class MainFrame extends JFrame {
 						Payment.payOrange();
 					if(company.equals("E-ON"))
 						Payment.payEon();
+					if(company.equals("Telekom"))
+						Payment.payTelekom();
 				}
 			}
 		});
@@ -411,6 +424,16 @@ public class MainFrame extends JFrame {
 
 					}
 				});
+		
+		// ************************************************************ Buton Genereaza Rapoarte
+				butGenereazaRapoarte.addActionListener(new ActionListener()
+						{
+							public void actionPerformed(ActionEvent e)
+							{
+								Rapoarte.run();
+							}
+						});
+				
 		
 		// ************************************************************ Buton Vizualizare Factura
 		butVizualizareFactura.addActionListener(new ActionListener() {
@@ -461,7 +484,7 @@ public class MainFrame extends JFrame {
 					return;
 				}
 				
-				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),5);
+				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),6);
 				if(selectedStatus.equals("Platita"))
 				{
 					JOptionPane.showMessageDialog(null, "Factura este deja platita", "Eroare", JOptionPane.ERROR_MESSAGE);

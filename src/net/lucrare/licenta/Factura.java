@@ -24,6 +24,9 @@ public class Factura {
 	@GeneratedValue(strategy=GenerationType.AUTO)
 	private Long id;
 	
+	@Column(name="UTILITATE")
+	private String utilitate;
+	
 	@Column(name="NR_FACTURA")
 	private String nrFactura;
 	
@@ -107,6 +110,14 @@ public class Factura {
 
 	public void setLink(String link) {
 		this.link = link;
+	}
+
+	public String getUtilitate() {
+		return utilitate;
+	}
+
+	public void setUtilitate(String utilitate) {
+		this.utilitate = utilitate;
 	}
 
 
