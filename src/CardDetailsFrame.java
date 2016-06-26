@@ -39,16 +39,16 @@ public class CardDetailsFrame extends JFrame {
 		this.setSize(300,100);
 		
 		// initialize the frame components
-		labelNumarCard = new JLabel("Numar Card: ");
-		labelDataExp =  new JLabel("Data Expirarii(MM/YYYY): ");
+		labelNumarCard = new JLabel("Număr Card: ");
+		labelDataExp =  new JLabel("Data Expirării(MM/YYYY): ");
 		labelCIV = new JLabel("Codul CIV");
 		labelNume = new JLabel("Titular Card");
 		textNumarCard = new JTextField(20);
 		textDataExp = new JTextField(10);
 		textCIV = new JTextField(5);
 		textNume = new JTextField(30);
-		butOK = new JButton("Introduceti datele");
-		butSterge = new JButton("Sterge");
+		butOK = new JButton("Introduceți datele");
+		butSterge = new JButton("Șterge");
 		
 		labelNumarCard.setAlignmentX(CENTER_ALIGNMENT);
 		
@@ -93,7 +93,7 @@ public class CardDetailsFrame extends JFrame {
 				
 				if(MainFrame.findCardDetails() == true)
 				{
-					JOptionPane.showMessageDialog(null,"Date adaugate cu succes");
+					JOptionPane.showMessageDialog(null,"Date adăugate cu succes");
 					frame.dispose();
 					String selectedCompany = MainFrame.company;
 					if(selectedCompany.equals("Orange"))

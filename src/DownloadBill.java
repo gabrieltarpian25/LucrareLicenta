@@ -229,6 +229,7 @@ public class DownloadBill {
 		element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("*[class^='btn btn-primary pull-left']")));
 		driver.get("https://www.telekom.ro/myaccount/servicii-fixe/plata-online/");
 		
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.id("factura")));
 		driver.findElement(By.id("factura")).click();
 		
 	}

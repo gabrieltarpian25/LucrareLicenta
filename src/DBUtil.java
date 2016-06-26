@@ -60,7 +60,7 @@ public class DBUtil {
 			if(nr.equals(billNumber))
 			{
 				// bill exists
-				JOptionPane.showMessageDialog(null, "Factura deja existenta", "Eroare", JOptionPane.ERROR_MESSAGE);
+				JOptionPane.showMessageDialog(null, "Factură deja existentă", "Eroare", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}
@@ -110,11 +110,11 @@ public class DBUtil {
 		et.commit();
 		
 		if (et != null) {
-			JOptionPane.showMessageDialog(null, "Factura adaugata cu succes");
+			JOptionPane.showMessageDialog(null, "Factură adăugată cu succes","Succes",JOptionPane.INFORMATION_MESSAGE);
 			MainFrame.getInstance().dispose();
 			MainFrame.run();
 		} else {
-			JOptionPane.showMessageDialog(null, "Eroare", "Eroare", JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(null, "Eroare la introducerea facturii", "Eroare", JOptionPane.ERROR_MESSAGE);
 		}
 
 	}

@@ -31,7 +31,7 @@ public class LoginDetailsFrame extends JFrame {
 	// class constructor
 	public LoginDetailsFrame()
 	{
-		super("Alege Compania");
+		super("Introduceți datele de logare");
 		drawGUI();
 	}
 	

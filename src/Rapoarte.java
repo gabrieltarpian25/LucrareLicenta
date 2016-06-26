@@ -47,9 +47,9 @@ public class Rapoarte extends JFrame {
 		labelTelefonie2016 = new JLabel("Total telefonie 2016: ");
 		labelTelefonie= new JLabel("Total telefonie: ");
 		
-		labelGazeNaturale2015= new JLabel("Gaze naturale 2015: ");
-		labelGazeNaturale2016 = new JLabel("Gaze naturale 2016: ");
-		labelGazeNaturale = new JLabel("Gaze naturale: ");
+		labelGazeNaturale2015= new JLabel("Total Gaze naturale 2015: ");
+		labelGazeNaturale2016 = new JLabel("Total Gaze naturale 2016: ");
+		labelGazeNaturale = new JLabel("Total Gaze naturale: ");
 		
 		labelTelefonie2015Value = new JLabel("0 lei");
 		labelTelefonie2016Value = new JLabel("0 lei");

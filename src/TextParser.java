@@ -176,9 +176,12 @@ public class TextParser {
 				// data factura
 				if(lines[i].contains("Data facturării: "))
 					dataFactura = lines[i].substring(17,lines[i].length());
-				// numar factura
-				if(lines[i].contains("Cod facturare: "))
-					numarFactura = lines[i].substring(15,lines[i].length());
+				// Numar Factura
+				if (lines[i].contains("Telekom Romania Communications S.A.")) {
+					String[] afterSplit = lines[i].split("Telekom Romania Communications S.A.");
+					numarFactura = afterSplit[0].substring(afterSplit[0].length()-7,afterSplit[0].length());
+					System.out.println("Numar Factura: " + numarFactura);
+				}
 				
 				// total plata
 				if(lines[i].contains("Total factură curentă "))
