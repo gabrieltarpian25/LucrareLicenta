@@ -330,5 +330,81 @@ public class Payment {
 		driver.get("https://www.telekom.ro/myaccount/servicii-fixe/plata-online/");
 		
 		driver.findElement(By.id("payBillSubmit")).click();
+		
+		//driver.findElement(By.cssSelector("*[class^='chk__fixed__R0645130000340']")).click();
+		//driver.findElement(By.id("fixedSelectAll")).click();
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.id("fixedSelectAll")));
+		driver.findElement(By.id("fixedSelectAll")).click();
+		
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("*[class^='btn btn-primary customPayCard']")));
+		driver.findElement(By.cssSelector("*[class^='btn btn-primary customPayCard']")).click();
+		
+		// scroll a little bit
+		//JavascriptExecutor jse = (JavascriptExecutor)driver;
+		//jse.executeScript("window.scrollBy(0,400)", "");
+		
+		driver.findElement(By.id("paymentButton")).click();
+		
+		String cardNumber = null;
+		String expirationDate = null;
+		String CIV = null;
+		String cardName = null;
+
+		br = null;
+
+		try {
+
+			String sCurrentLine;
+			br = new BufferedReader(new FileReader("./Details/detaliiCard.txt"));
+			// card number
+			sCurrentLine = br.readLine();
+			cardNumber = sCurrentLine;
+
+			// expiration date
+			sCurrentLine = br.readLine();
+			expirationDate = sCurrentLine;
+
+			// CIV
+			sCurrentLine = br.readLine();
+			CIV = sCurrentLine;
+
+			// card name
+			sCurrentLine = br.readLine();
+			cardName = sCurrentLine;
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (br != null)
+					br.close();
+			} catch (Exception ex) {
+				ex.printStackTrace();
+			}
+		}
+		
+		// send card number
+		element = wait.until(ExpectedConditions.elementToBeClickable(By.id("tiCNumber")));
+		driver.findElement(By.id("tiCNumber")).click();
+		driver.findElement(By.id("tiCNumber")).sendKeys(new String[] { cardNumber });
+		
+		// send expiration date month
+		driver.findElement(By.id("cbExpMounth")).click();
+		driver.findElement(By.id("cbExpMounth")).sendKeys(new String[] { expirationDate.substring(0, 2) });
+		
+		// send expiration date month
+		driver.findElement(By.id("cbExpYear")).click();
+		driver.findElement(By.id("cbExpYear")).sendKeys(new String[] { expirationDate.substring(3,7) });
+		
+		// send CVV Code
+		driver.findElement(By.id("cvv2")).click();
+		driver.findElement(By.id("cvv2")).sendKeys(new String[] { CIV });
+		
+		// send Card Holder
+		driver.findElement(By.id("nameoncard")).click();
+		driver.findElement(By.id("nameoncard")).sendKeys(new String[] { cardName });
+		
+		driver.findElement(By.id("AuthorizeButton")).click();
+		
 	}
 }

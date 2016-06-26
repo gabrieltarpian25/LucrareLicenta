@@ -70,23 +70,34 @@ import net.lucrare.licenta.Factura;
 
 public class MainFrame extends JFrame {
 
-	// Singleton MainFrame
+	// Fereastra de bază
 	private static MainFrame frame = null;
 	
-	// boolean values that informs us what option is selected when showing the companies
+	// tabelul bazei de date
+	private static JTable tabel;
+	
+	// câmpul de text pentru căutarea facturilor
+	JTextField textSearchFactura;
+	
+	// butoanele pentru acțiuni
+	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, 
+	butDownloadFactura,butVizualizareFactura,butMarcarePlata,
+	butGenereazaRapoarte;
+	
+	// partea de sus a ferestrei unde sunt adăugate butoanele
+	JPanel panelSus;
+	
+	// fontul utilizat în afișarea grafică
+	Font f;
+	
+	// variable care ne informează despre acțiunea aleasă
 	static boolean boAdaugaFactura = false;
 	static boolean boDownloadFactura = false;
+	
 	static boolean boPlatesteFactura = false;
 	
-	// String value that stores the name of the company that it is chosen to pay the bill
+	// Stochează numele companiei
 	static String company = null;
-
-	private static JTable tabel;
-	JTextField textSearchFactura;
-	JButton butAdaugaFactura, butStergeFactura, butPlatesteFactura, butDownloadFactura,butVizualizareFactura,butMarcarePlata,
-	butGenereazaRapoarte;
-	JPanel panelSus;
-	Font f;
 
 	// get instance
 	public static MainFrame getInstance() {
@@ -156,13 +167,13 @@ public class MainFrame extends JFrame {
 
 		// buttons
 		panelSus = new JPanel();
-		butAdaugaFactura = new JButton("Adauga Factura");
-		butStergeFactura = new JButton("Sterge Factura");
-		butPlatesteFactura = new JButton("Plateste Factura");
-		butDownloadFactura = new JButton("Descarca Factura");
-		butVizualizareFactura = new JButton("Vizualizeaza Factura");
-		butMarcarePlata = new JButton("Factura platita");
-		butGenereazaRapoarte = new JButton("Genereaza Rapoarte");		
+		butAdaugaFactura = new JButton("Adaugă Factura");
+		butStergeFactura = new JButton("Șterge Factura");
+		butPlatesteFactura = new JButton("Plătește Factura");
+		butDownloadFactura = new JButton("Descarcă Factura");
+		butVizualizareFactura = new JButton("Vizualizează Factura");
+		butMarcarePlata = new JButton("Factură plătită");
+		butGenereazaRapoarte = new JButton("Generează Rapoarte");		
 		
 		textSearchFactura = new JTextField(10);
 		panelSus.add(textSearchFactura);
@@ -174,7 +185,7 @@ public class MainFrame extends JFrame {
 		panelSus.add(butMarcarePlata);
 		panelSus.add(butGenereazaRapoarte);
 
-		TextPrompt tp = new TextPrompt("Cautare",textSearchFactura);
+		TextPrompt tp = new TextPrompt("Căutare",textSearchFactura);
 		
 		
 		// font
@@ -341,38 +352,44 @@ public class MainFrame extends JFrame {
 				
 				if (tabel.getSelectedRows().length != 1)
 				{
-					JOptionPane.showMessageDialog(null, "Trebuie selectata o singura factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Trebuie selectată o singură factură", "Eroare", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
 				String[] options = new String[2];
 				options[0] = new String("NU");
 				options[1] = new String("DA");
-				int answer=JOptionPane.showOptionDialog(frame.getContentPane(),"Sunteti sigur?","Atentionare", 0,JOptionPane.INFORMATION_MESSAGE,null,options,null);
+				int answer=JOptionPane.showOptionDialog(frame.getContentPane(),"Sunteți sigur?","Atenționare", 0,JOptionPane.INFORMATION_MESSAGE,null,options,null);
 				
 				if (answer == 1) 
 				{
 					String nrFactura = getSelectedNrFactura();
+					int r = 0;
+					
+					try {
+						String PERSISTENCE_UNIT_NAME = "persistenceIG";
+						EntityManagerFactory factory;
+						factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
+						EntityManager em = factory.createEntityManager();
 
-					String PERSISTENCE_UNIT_NAME = "persistenceIG";
-					EntityManagerFactory factory;
-					factory = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT_NAME);
-					EntityManager em = factory.createEntityManager();
-
-					Query query = em.createQuery("DELETE FROM Factura f WHERE f.nrFactura = :nrFact");
-					query.setParameter("nrFact", nrFactura);
-					EntityTransaction et = em.getTransaction();
-					et.begin();
-					int r = query.executeUpdate();
-					et.commit();
+						Query query = em.createQuery("DELETE FROM Factura f WHERE f.nrFactura = :nrFact");
+						query.setParameter("nrFact", nrFactura);
+						EntityTransaction et = em.getTransaction();
+						et.begin();
+						r = query.executeUpdate();
+						et.commit();
+					} catch (Exception e1) {
+						JOptionPane.showMessageDialog(null, "Eroare în vederea stabilirii conexiunii", "Eroare",
+								JOptionPane.ERROR_MESSAGE);
+					}
 					// factory.close();
 					// em.close();
 					if (r > 0) {
-						JOptionPane.showMessageDialog(null, "Factura stearsa cu succes");
+						JOptionPane.showMessageDialog(null, "Factură ștearsă cu succes");
 						frame.dispose();
 						MainFrame.run();
 					} else {
-						JOptionPane.showMessageDialog(null, "Eroare", "Eroare", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Eroare la ștergerea facturii", "Eroare", JOptionPane.ERROR_MESSAGE);
 					}
 				}
 			}
@@ -384,14 +401,14 @@ public class MainFrame extends JFrame {
 				
 				if (tabel.getSelectedRows().length != 1)
 				{
-					JOptionPane.showMessageDialog(null, "Trebuie selectata o singura factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Trebuie selectată o singură factură", "Eroare", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
 				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),6);
 				if(selectedStatus.equals("Platita"))
 				{
-					JOptionPane.showMessageDialog(null, "Factura este deja platita", "Eroare", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Factura este deja plătită", "Eroare", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
@@ -464,12 +481,12 @@ public class MainFrame extends JFrame {
 					// open the bill
 					try {
 						Desktop.getDesktop().open(new File(link));
-					} catch (IOException e1) {
+					} catch (Exception e1) {
 						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						JOptionPane.showMessageDialog(null, "Factura nu se mai află la calea respectivă", "Eroare", JOptionPane.ERROR_MESSAGE);
 					}
 				}
-				else JOptionPane.showMessageDialog(null, "O singura factura trebuie selectata", "Eroare", JOptionPane.ERROR_MESSAGE);
+				else JOptionPane.showMessageDialog(null, "O singură factură trebuie selectată", "Eroare", JOptionPane.ERROR_MESSAGE);
 			}
 		});
 			
@@ -480,14 +497,14 @@ public class MainFrame extends JFrame {
 
 				if (tabel.getSelectedRows().length != 1)
 				{
-					JOptionPane.showMessageDialog(null, "Trebuie selectata o singura factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Trebuie selectata o singură factură", "Eroare", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
 				String selectedStatus = (String) tabel.getValueAt(tabel.getSelectedRow(),6);
 				if(selectedStatus.equals("Platita"))
 				{
-					JOptionPane.showMessageDialog(null, "Factura este deja platita", "Eroare", JOptionPane.ERROR_MESSAGE);
+					JOptionPane.showMessageDialog(null, "Factura este deja plătită", "Eroare", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
@@ -511,11 +528,11 @@ public class MainFrame extends JFrame {
 					// factory.close();
 					// em.close();
 					if (r > 0) {
-						JOptionPane.showMessageDialog(null, "Factura editata cu succes");
+						JOptionPane.showMessageDialog(null, "Factură editată cu succes");
 						frame.dispose();
 						MainFrame.run();
 					} else {
-						JOptionPane.showMessageDialog(null, "Eroare editare factura", "Eroare", JOptionPane.ERROR_MESSAGE);
+						JOptionPane.showMessageDialog(null, "Eroare editare factură", "Eroare", JOptionPane.ERROR_MESSAGE);
 					}
 			}
 			});
